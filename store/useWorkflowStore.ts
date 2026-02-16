@@ -11,7 +11,7 @@ import {
   OnEdgesChange, 
   OnConnect 
 } from 'reactflow';
-import { NodeType, NodeData, ExecutionRun } from '../types';
+import { NodeType, NodeData, ExecutionRun, User } from '../types';
 
 interface WorkflowStore {
   nodes: Node<NodeData>[];
@@ -19,6 +19,7 @@ interface WorkflowStore {
   history: ExecutionRun[];
   isRunning: boolean;
   selectedRunId?: string;
+  user: User | null;
   
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
@@ -32,6 +33,8 @@ interface WorkflowStore {
   setSelectedRunId: (id: string | undefined) => void;
   addNode: (type: NodeType, position: { x: number, y: number }) => void;
   isHandleConnected: (nodeId: string, handleId?: string, type?: 'target' | 'source') => boolean;
+  login: () => void;
+  logout: () => void;
 }
 
 export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
@@ -40,6 +43,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
   history: [],
   isRunning: false,
   selectedRunId: undefined,
+  user: null,
 
   onNodesChange: (changes) => {
     set({
@@ -75,8 +79,26 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
   setIsRunning: (running) => set({ isRunning: running }),
   setSelectedRunId: (id) => set({ selectedRunId: id }),
 
+  login: () => set({ 
+    user: { 
+      id: 'usr_1', 
+      name: 'Alex Rivera', 
+      email: 'alex@weavy.ai', 
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex' 
+    } 
+  }),
+  logout: () => set({ user: null, history: [] }),
+
   addNode: (type, position) => {
     const id = `${type}-${Date.now()}`;
+    const serviceMap: Record<NodeType, string> = {
+      [NodeType.TEXT]: 'Local',
+      [NodeType.UPLOAD_IMAGE]: 'Transloadit',
+      [NodeType.UPLOAD_VIDEO]: 'Transloadit',
+      [NodeType.RUN_LLM]: 'Gemini API',
+      [NodeType.CROP_IMAGE]: 'Trigger.dev',
+      [NodeType.EXTRACT_FRAME]: 'Trigger.dev',
+    };
     const newNode: Node<NodeData> = {
       id,
       type,
@@ -85,7 +107,8 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
         label: type.replace('Node', '').split(/(?=[A-Z])/).join(' '),
         status: 'idle',
         inputs: {},
-        config: {}
+        config: {},
+        service: serviceMap[type] as any
       },
     };
     set({ nodes: [...get().nodes, newNode] });

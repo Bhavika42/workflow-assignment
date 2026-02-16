@@ -8,6 +8,13 @@ export enum NodeType {
   EXTRACT_FRAME = 'extractFrameNode',
 }
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+}
+
 export interface NodeData {
   label: string;
   value?: string;
@@ -16,6 +23,7 @@ export interface NodeData {
   status?: 'idle' | 'running' | 'success' | 'error';
   errorMessage?: string;
   config?: Record<string, any>;
+  service?: 'Local' | 'Transloadit' | 'Trigger.dev' | 'Gemini API';
 }
 
 export interface ExecutionRun {
@@ -33,4 +41,5 @@ export interface WorkflowState {
   history: ExecutionRun[];
   isRunning: boolean;
   selectedRunId?: string;
+  user: User | null;
 }
