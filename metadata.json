@@ -1,0 +1,8 @@
+{
+  "name": "Weavy-Style Visual Workflow Builder",
+  "description": "A pixel-perfect visual workflow builder for LLM-based tasks, featuring multimodal AI, image processing, and video frame extraction.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
